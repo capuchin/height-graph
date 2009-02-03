@@ -1,6 +1,7 @@
 from lxml import etree
 import math 
 import cmath
+import matplotlib.pyplot as plt
 
 def nestedSplit(astring, sep=None, *subsep):
     """
@@ -22,11 +23,11 @@ def getTrackFromKML(filepath):
 	root = etree.fromstring(str)
 	coords= []
 	for child in root.iter():
-		if child.tag == "{http://earth.google.com/kml/2.2}coordinates":
+		if child.tag == "{http://earth.google.com/kml/2.1}coordinates":
 			coords.append(child.text)
-	#if (len(coords)):
-	#	coord_list = nestedSplit(coords[0], "\n", ",")
-	coord_list = nestedSplit(coords[1], "\n", ",")
+
+	coord_list = nestedSplit(coords[138], "\n", ",")
+
 	new_coord_list = []
 	for item in coord_list:
 		triple = []
@@ -58,16 +59,32 @@ def addDistToTrack(track):
 	"""
 	Add distance from last point to track
 	"""
-	for i in range(0, len(track)):
+	for i in range(0, len(track)):		
 		if (i == 0):
-			prev = track[i]
+			prev = track[i]			
 			track[i].append(0)
 		else:
+			prev = track[i-1]
 			track[i].append(getDist(prev[0], prev[1], track[i][0], track[i][1]))	
 	return track
 
-track = getTrackFromKML('/home/mike/Desktop/maps/kml/1_1_1_1.kml')
+def addCumDistToTrack(track):
+	"""
+	Add total
+	"""
+	tot = 0
+	for i in range(0, len(track)):		
+		tot += track[i][3]
+		track[i].append(tot)
+	return track
+
+track = getTrackFromKML('/home/mike/Desktop/maps/kml/test.kml')
 track = addDistToTrack(track)
+track = addCumDistToTrack(track)
+
+
+
+print "track"
 print track
 
 max_ele = 0
@@ -79,15 +96,16 @@ for i in track:
 		max_ele = i[2]
 	if  i[2] < min_ele:	
 		mix_ele = i[2]
-print tot_dist
-print max_ele
-print min_ele
 
-import matplotlib.pyplot as plt
+print "tot dist: " + str(tot_dist)
+print "max ele: " + str(max_ele)
+print "min ele :" + str(min_ele)
+
+
 x =[]
 y = []
 for i in track:
-	x.append(i[3])
+	x.append(i[4])
 	y.append(i[2])
 plt.plot(x, y)
 plt.show()
