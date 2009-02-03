@@ -24,8 +24,9 @@ def getTrackFromKML(filepath):
 	for child in root.iter():
 		if child.tag == "{http://earth.google.com/kml/2.2}coordinates":
 			coords.append(child.text)
-	coord_list = nestedSplit(coords, "\n", ",")
-	#coord_list = nestedSplit(coords[1], "\n", ",")
+	#if (len(coords)):
+	#	coord_list = nestedSplit(coords[0], "\n", ",")
+	coord_list = nestedSplit(coords[1], "\n", ",")
 	new_coord_list = []
 	for item in coord_list:
 		triple = []
@@ -65,7 +66,7 @@ def addDistToTrack(track):
 			track[i].append(getDist(prev[0], prev[1], track[i][0], track[i][1]))	
 	return track
 
-track = getTrackFromKML('/home/mike/Desktop/maps/kml/test.kml')
+track = getTrackFromKML('/home/mike/Desktop/maps/kml/1_1_1_1.kml')
 track = addDistToTrack(track)
 print track
 
