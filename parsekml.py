@@ -32,12 +32,17 @@ def getTrackFromKML(filepath):
 	coords= []
 	for child in root.iter():
 		if regex.match(child.tag):
-		#if child.tag == "{http://earth.google.com/kml/2.1}coordinates":
 			coords.append(child.text)
 
-	print "length :" 
-	print len(coords)
-	coord_list = nestedSplit(coords[0], "\n", ",")
+	print "found %d lines in file" % len(coords)
+
+	# split each coord triple on whitespace
+	# then append each triple as a list to coord_list
+	regex2 = re.compile('\s+')
+	s = regex2.split(coords[0])
+	coord_list = []
+	for i in s:
+		coord_list.append(i.split(','))
 
 	new_coord_list = []
 	for item in coord_list:
@@ -96,16 +101,10 @@ parser.add_option("-i", "--input-file", dest="input_file",
 
 (options, args) = parser.parse_args()
 
-#track = getTrackFromKML('/home/mike/Desktop/maps/kml/chartwell-feb4-snip2.kml')
 track = getTrackFromKML(options.input_file)
 
 track = addDistToTrack(track)
 track = addCumDistToTrack(track)
-
-
-
-#print "track"
-#print track
 
 max_ele = 0
 min_ele = 0
