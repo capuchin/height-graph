@@ -27,7 +27,7 @@ def getTrackFromKML(filepath):
 	str = f.read()
 	root = etree.fromstring(str)
 
-	regex = re.compile('\{http\:\/\/earth.google.com\/kml\/\d+\.\d+\}coordinates')
+	regex = re.compile('\{\S+}coordinates')
 
 	coords= []
 	for child in root.iter():
