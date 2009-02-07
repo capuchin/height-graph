@@ -1,7 +1,12 @@
+#!/usr/bin/env python
+
 from lxml import etree
 import math 
 import cmath
 import matplotlib.pyplot as plt
+from optparse import OptionParser
+import re
+
 
 def nestedSplit(astring, sep=None, *subsep):
     """
@@ -21,12 +26,18 @@ def getTrackFromKML(filepath):
 	f = open(filepath, 'r')
 	str = f.read()
 	root = etree.fromstring(str)
+
+	regex = re.compile('\{http\:\/\/earth.google.com\/kml\/\d+\.\d+\}coordinates')
+
 	coords= []
 	for child in root.iter():
-		if child.tag == "{http://earth.google.com/kml/2.1}coordinates":
+		if regex.match(child.tag):
+		#if child.tag == "{http://earth.google.com/kml/2.1}coordinates":
 			coords.append(child.text)
 
-	coord_list = nestedSplit(coords[138], "\n", ",")
+	print "length :" 
+	print len(coords)
+	coord_list = nestedSplit(coords[0], "\n", ",")
 
 	new_coord_list = []
 	for item in coord_list:
@@ -78,14 +89,23 @@ def addCumDistToTrack(track):
 		track[i].append(tot)
 	return track
 
-track = getTrackFromKML('/home/mike/Desktop/maps/kml/test.kml')
+
+parser = OptionParser()
+parser.add_option("-i", "--input-file", dest="input_file",
+                  help="kml file to read from", metavar="FILE")
+
+(options, args) = parser.parse_args()
+
+#track = getTrackFromKML('/home/mike/Desktop/maps/kml/chartwell-feb4-snip2.kml')
+track = getTrackFromKML(options.input_file)
+
 track = addDistToTrack(track)
 track = addCumDistToTrack(track)
 
 
 
-print "track"
-print track
+#print "track"
+#print track
 
 max_ele = 0
 min_ele = 0
@@ -105,6 +125,7 @@ print "min ele :" + str(min_ele)
 x =[]
 y = []
 for i in track:
+#for i in range(len(track), 0):
 	x.append(i[4])
 	y.append(i[2])
 plt.plot(x, y)
