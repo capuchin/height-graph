@@ -27,7 +27,7 @@ def getTrackFromKML(filepath):
 	str = f.read()
 	root = etree.fromstring(str)
 
-	regex = re.compile('\{\S+}coordinates')
+	regex = re.compile('{\S+}coordinates')
 
 	coords= []
 	for child in root.iter():
@@ -98,11 +98,12 @@ def addCumDistToTrack(track):
 parser = OptionParser()
 parser.add_option("-i", "--input-file", dest="input_file",
                   help="kml file to read from", metavar="FILE")
+parser.add_option("-t", "--title", dest="title",
+                  help="title text used on graphic", metavar="TITLE")
 
 (options, args) = parser.parse_args()
 
 track = getTrackFromKML(options.input_file)
-
 track = addDistToTrack(track)
 track = addCumDistToTrack(track)
 
@@ -127,7 +128,16 @@ for i in track:
 #for i in range(len(track), 0):
 	x.append(i[4])
 	y.append(i[2])
+
+
+
+
 plt.plot(x, y)
+ttext = plt.title(options.title)
+ytext = plt.ylabel('Elevation (m)')
+xtext = plt.xlabel('Distance (km)')
+plt.setp(xtext, size='medium', name='courier', weight='bold', color='black')
+
 plt.show()
 
 
