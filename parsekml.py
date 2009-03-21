@@ -21,23 +21,82 @@ def nestedSplit(astring, sep=None, *subsep):
 def getTrackFromKML(filepath):
 	""" 
 	Takes a path to kml file 
+	Expects a single track per kml file
 	returns a list containing [lat, long, elevation] triples
 	"""
 	f = open(filepath, 'r')
 	str = f.read()
 	root = etree.fromstring(str)
 
-	regex = re.compile('{\S+}coordinates')
+	r_coords = re.compile('{\S+}coordinates')
 
 	coords= []
 	for child in root.iter():
-		if regex.match(child.tag):
+		if r_coords.match(child.tag):
 			coords.append(child.text)
 
 	print "found %d lines in file" % len(coords)
 
 	# split each coord triple on whitespace
 	# then append each triple as a list to coord_list
+	regex2 = re.compile('\s+')
+	s = regex2.split(coords[0])
+	coord_list = []
+	for i in s:
+		coord_list.append(i.split(','))
+
+	new_coord_list = []
+	for item in coord_list:
+		triple = []
+		for n in item:
+			s = n.strip()
+			try:
+				triple.append( float(s))
+			except ValueError:
+				pass
+		if (len(triple)!=0):
+			new_coord_list.append(triple)
+	return new_coord_list
+
+def importKML(filepath):
+	""" 
+	Takes the KML file, returns an lxml object
+	"""
+	f = open(filepath, 'r')
+	str = f.read()
+	return etree.fromstring(str)
+
+def extractTracks(xml):
+	"""
+	Takes an lxml representation of xml
+	Returns list of the form
+	[name, [coords_str]..[coords_str]]
+	
+	assumes track segments are in order with no gaps!
+	"""
+	r_coords = re.compile('{\S+}coordinates')
+	r_name = re.compile('{\S+}name')
+	coords= []
+	
+	first = True
+	for child in xml.iter():
+		if r_name.match(child.tag) and first:
+			first = False
+			name = child.text
+			print child.text
+		if r_coords.match(child.tag):
+			coords.append(child.text)
+	
+	print "found %d lines in file" % len(coords)
+
+	coords.insert(0, name)
+	return coords
+
+def extractCoords(coords):
+	"""
+	split each coord triple on whitespace
+	then append each triple as a list to coord_list
+	"""
 	regex2 = re.compile('\s+')
 	s = regex2.split(coords[0])
 	coord_list = []
@@ -103,7 +162,11 @@ parser.add_option("-t", "--title", dest="title",
 
 (options, args) = parser.parse_args()
 
-track = getTrackFromKML(options.input_file)
+#track = getTrackFromKML(options.input_file)
+#track = getTracksFromKML(options.input_file)
+xml = importKML(options.input_file)
+print extractTracks(xml)
+
 track = addDistToTrack(track)
 track = addCumDistToTrack(track)
 
