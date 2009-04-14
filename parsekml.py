@@ -162,7 +162,7 @@ parser.add_option("-t", "--title", dest="title",
 
 (options, args) = parser.parse_args()
 
-#track = getTrackFromKML(options.input_file)
+track = getTrackFromKML(options.input_file)
 #track = getTracksFromKML(options.input_file)
 xml = importKML(options.input_file)
 print extractTracks(xml)

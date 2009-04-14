@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 import csv
 from optparse import OptionParser
 import matplotlib.pyplot as plt
@@ -10,6 +9,7 @@ from matplotlib.numerix import sin, cos, exp, pi, arange
 import matplotlib
 matplotlib.use("WXAgg") # do this before pylab so you don'tget the default back end.
 import pylab
+
 
 params = {'backend': 'ps',
            'axes.labelsize': 14,
@@ -27,6 +27,7 @@ parser.add_option("-t", "--title", dest="title",
                   help="title text used on graphic", metavar="TITLE")
 
 (options, args) = parser.parse_args()
+# example: ./plotcsv.py -i elevationdata.csv -s section-titles.csv -t "Grand Loop"
 
 csvreader = csv.reader(open(options.input_file), delimiter=',', quotechar='|')
 x =[]
