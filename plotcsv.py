@@ -4,6 +4,20 @@ import csv
 from optparse import OptionParser
 import matplotlib.pyplot as plt
 
+
+from matplotlib.numerix import sin, cos, exp, pi, arange
+
+import matplotlib
+matplotlib.use("WXAgg") # do this before pylab so you don'tget the default back end.
+import pylab
+
+params = {'backend': 'ps',
+           'axes.labelsize': 14,
+           'text.fontsize': 14,
+           'legend.fontsize': 14,
+           'xtick.labelsize': 14,
+           'ytick.labelsize': 14}
+
 parser = OptionParser()
 parser.add_option("-i", "--input-file", dest="input_file",
                   help="csv file to read from", metavar="FILE")
@@ -41,13 +55,21 @@ for i in range(0, len(titles)):
 			top = y[j]
 	plt.vlines(accm_dist, 0, top, color = 'darkgreen')
 
-plt.axis([0, 10, 0, 450])
+plt.axis([0, x[len(x)-1], 0, 450])
+#pylab.yticks(arange(2))
 
 ttext = plt.title(options.title)
 ytext = plt.ylabel('Altitude (m)')
 xtext = plt.xlabel('Distance (km)')
 
 plt.grid(True)
-plt.setp(xtext, size='medium', name='courier', color='black')
+plt.setp(xtext, size='small', name='courier', color='black')
+F = pylab.gcf()
+pylab.rcParams.update(params)
+DefaultSize = F.get_size_inches()
+F.set_size_inches( (DefaultSize[0]/1.6), DefaultSize[1]/2)
+# the default is 100dpi for savefig:
+F.savefig("test1.png")
+
 plt.show()
 
