@@ -6,6 +6,7 @@ import cmath
 import matplotlib.pyplot as plt
 from optparse import OptionParser
 import re
+import csv
 
 
 def nestedSplit(astring, sep=None, *subsep):
@@ -153,12 +154,30 @@ def addCumDistToTrack(track):
 		track[i].append(tot)
 	return track
 
-
+def smoothBasic(track, window=20):
+	"""
+	Basic smoothing function
+    """
+	x = []
+	y = []	
+	for i in range(0, len(track)):
+		tot = 0
+		for j in range(i, i+window):
+			if (j + window) < len(track):
+				tot = tot + track[j][2]
+		track[i][2] = tot/window
+	return track
+	
 parser = OptionParser()
 parser.add_option("-i", "--input-file", dest="input_file",
                   help="kml file to read from", metavar="FILE")
 parser.add_option("-t", "--title", dest="title",
                   help="title text used on graphic", metavar="TITLE")
+parser.add_option("-o", "--output", dest="output_file",
+                  help="spit out csv ", metavar="OUTPUT")
+parser.add_option("-s", "--smooth", dest="smooth",
+                  help="apply smooth ", metavar="SMOOTH")
+
 
 (options, args) = parser.parse_args()
 
@@ -185,15 +204,17 @@ print "max ele: " + str(max_ele)
 print "min ele :" + str(min_ele)
 
 
+if options.smooth == 'simple':
+	track = smoothBasic(track)
+		
+
 x =[]
 y = []
+csvOut = csv.writer(open(options.output_file, 'w') , delimiter=',', quotechar='|')
 for i in track:
-#for i in range(len(track), 0):
-	x.append(i[4])
-	y.append(i[2])
-
-
-
+    x.append(i[4])
+    y.append(i[2])
+    csvOut.writerow([i[4],i[2]])
 
 plt.plot(x, y)
 ttext = plt.title(options.title)
@@ -202,12 +223,3 @@ xtext = plt.xlabel('Distance (km)')
 plt.setp(xtext, size='medium', name='courier', weight='bold', color='black')
 
 plt.show()
-
-
-"""
-triple1 = track[0]
-triple2 = track[1]
-print triple1
-print triple2
-print getDist(triple1[0], triple1[1], triple2[0], triple2[1])
-"""
